@@ -92,6 +92,7 @@ export type QuizQuestion =
 export type QuizData = {
     questions: QuizQuestion[]
     learningPath: string
+    id: number
 }
 
 type BaseAnswer = {

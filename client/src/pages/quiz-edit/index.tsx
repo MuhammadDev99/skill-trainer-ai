@@ -2,7 +2,7 @@ import styles from "./style.module.css"
 import { currentQuiz, quizAnswers, currentQuestionIndex, instantFeedbackEnabled } from '../../store/quizStore';
 import { useNavigate } from "react-router-dom";
 import { getQustionTypeImage } from "../../utils";
-import type { QuizQuestion } from "../../common/types";
+import type { QuizData, QuizQuestion } from "../../common/types";
 import { correctColored, garbage, questionmark, wrongColored } from "../../images";
 import { signal } from "@preact/signals-react";
 
@@ -68,17 +68,31 @@ function QuestionOptionsView({ question }: { question: QuizQuestion }) {
 const markedDeletedQuestions = signal<Record<number, boolean>>({});
 export default function QuizEdit() {
     const navigate = useNavigate()
-    if (!currentQuiz.value) {
+    if (!currentQuiz.value || !currentQuiz.value.questions) {
         navigate("/")
     }
     function onToggleDeleteQuestion(question: QuizQuestion) {
         let isDeleted = markedDeletedQuestions.value[question.id] ?? false
         markedDeletedQuestions.value = { ...markedDeletedQuestions.value, [question.id]: !isDeleted }
     }
+    function saveChanges() {
+        const originalQuiz = currentQuiz.value
+        if (!originalQuiz) return
+        const deletedIds = Object.keys(markedDeletedQuestions.value).map(x => Number(x)).filter(x => markedDeletedQuestions.value[x])
+        const updatedQuiz: QuizData = { ...originalQuiz, questions: originalQuiz.questions?.filter(x => !deletedIds.includes(x.id)) }
+        if (changesMade) {
+            currentQuiz.value = updatedQuiz
+        }
+    }
+    const questions = currentQuiz.value?.questions;
+    const changesMade = questions?.some(x => markedDeletedQuestions.value[x.id])
     return (<div className={styles.container}>
         <h1>Quiz edit</h1>
+        <div>
+            <button disabled={!changesMade} onClick={saveChanges}>Save changes</button>
+        </div>
         <div className={styles.questions}>
-            {currentQuiz.value?.questions.map((question) => {
+            {questions?.map((question) => {
                 const isDeleted = markedDeletedQuestions.value[question.id]
                 return (<div key={question.id} className={`${styles.question} ${isDeleted ? styles.deleted : ""}`}>
                     <div className={styles.dividerContainer}>
