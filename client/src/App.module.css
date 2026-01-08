@@ -1,0 +1,95 @@
+.app {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #212121;
+    color: white;
+}
+
+.quiz h2,
+p {
+    margin: 0;
+    padding: 0
+}
+
+.quiz {
+    margin-top: 40px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.quizOptions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.quizOption>button {
+    color: white;
+    background: rgb(64, 64, 64);
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.quizOption>button>span {
+    font-weight: bold;
+    color: rgb(222, 222, 222);
+}
+
+.quizOptionButtonHover:hover {
+    background: rgb(89, 89, 89);
+}
+
+.wrongOption>button {
+    background: rgb(134, 84, 84);
+}
+
+
+
+.correctOption>button {
+    background: rgb(70, 113, 66);
+}
+
+.correctOption>button:hover {
+    background: rgb(70, 113, 66);
+}
+
+.quiz {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.quizTopic {}
+
+.quizQuestion {}
+
+
+
+.quizNavigation {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+.quizNavigation>button {
+    cursor: pointer;
+    border: none;
+    background: rgb(47, 83, 95);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+}
+
+.quizNavigation>button:hover {
+    background: rgb(57, 103, 118);
+}

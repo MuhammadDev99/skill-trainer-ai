@@ -1,0 +1,17 @@
+import downArrow from './images/downArrow.png'
+import upArrow from './images/upArrow.png'
+import correct from './images/correct.png'
+import wrong from './images/wrong.png'
+import correctColored from './images/correctColored.png'
+import wrongColored from './images/wrongColored.png'
+import filleBlankQuestion from './images/fill-blank-question.png'
+import selectQuestion from './images/select-one-question.png'
+import selectMultiQuestion from './images/select-multi-question.png'
+import openEndedQuestion from './images/open-ended-question.png'
+import trueFalseQuestion from './images/true-false.png'
+import sortQuestion from './images/sort-question.png'
+import matchQuestion from './images/match-question.png'
+import errorImage from './images/error.png'
+import questionmark from './images/questionmark.png'
+
+export { downArrow, upArrow, correct, wrong, correctColored, wrongColored, filleBlankQuestion, selectQuestion, selectMultiQuestion, openEndedQuestion, trueFalseQuestion, sortQuestion, matchQuestion, errorImage, questionmark }
