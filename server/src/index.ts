@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
-// Load env immediately
 import path from 'path';
 const __DIRNAME = import.meta.dirname;
+console.log(path.resolve(__DIRNAME, '../.env'))
 dotenv.config({ path: path.resolve(__DIRNAME, '../.env') });
 import express, { Request, Response } from 'express';
 import cors from 'cors';

@@ -13,5 +13,5 @@ import sortQuestion from './images/sort-question.png'
 import matchQuestion from './images/match-question.png'
 import errorImage from './images/error.png'
 import questionmark from './images/questionmark.png'
-
-export { downArrow, upArrow, correct, wrong, correctColored, wrongColored, filleBlankQuestion, selectQuestion, selectMultiQuestion, openEndedQuestion, trueFalseQuestion, sortQuestion, matchQuestion, errorImage, questionmark }
+import garbage from './images/garbage.png'
+export { downArrow, upArrow, correct, wrong, correctColored, wrongColored, filleBlankQuestion, selectQuestion, selectMultiQuestion, openEndedQuestion, trueFalseQuestion, sortQuestion, matchQuestion, errorImage, questionmark, garbage }

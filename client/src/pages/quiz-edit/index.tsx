@@ -3,7 +3,8 @@ import { currentQuiz, quizAnswers, currentQuestionIndex, instantFeedbackEnabled 
 import { useNavigate } from "react-router-dom";
 import { getQustionTypeImage } from "../../utils";
 import type { QuizQuestion } from "../../common/types";
-import { correctColored, questionmark, wrongColored } from "../../images";
+import { correctColored, garbage, questionmark, wrongColored } from "../../images";
+import { signal } from "@preact/signals-react";
 
 
 function QuestionOptionsView({ question }: { question: QuizQuestion }) {
@@ -38,8 +39,8 @@ function QuestionOptionsView({ question }: { question: QuizQuestion }) {
         {question.type === 'matching' && (
             <div className={styles.questionOptions}>
                 {question.pairs.map(x => {
-                    return (<div>
-                        <p>{x.id}. {x.left} -  {x.right}</p>
+                    return (<div className={styles.matchingOption}>
+                        <p>{x.id}. <span>{x.left}</span> -  {x.right}</p>
                     </div>)
                 })}
             </div>
@@ -64,20 +65,26 @@ function QuestionOptionsView({ question }: { question: QuizQuestion }) {
         )}
     </>)
 }
-
+const markedDeletedQuestions = signal<Record<number, boolean>>({});
 export default function QuizEdit() {
     const navigate = useNavigate()
     if (!currentQuiz.value) {
         navigate("/")
     }
+    function onToggleDeleteQuestion(question: QuizQuestion) {
+        let isDeleted = markedDeletedQuestions.value[question.id] ?? false
+        markedDeletedQuestions.value = { ...markedDeletedQuestions.value, [question.id]: !isDeleted }
+    }
     return (<div className={styles.container}>
         <h1>Quiz edit</h1>
         <div className={styles.questions}>
             {currentQuiz.value?.questions.map((question) => {
-                return (<div key={question.id} className={styles.question}>
+                const isDeleted = markedDeletedQuestions.value[question.id]
+                return (<div key={question.id} className={`${styles.question} ${isDeleted ? styles.deleted : ""}`}>
                     <div className={styles.dividerContainer}>
                         <p>{question.id}</p>
                         <div className={styles.divider}></div>
+                        <img onClick={() => onToggleDeleteQuestion(question)} src={garbage} className={styles.deleteButton} />
                     </div>
 
                     <div className={styles.questionPromptContainer}>
