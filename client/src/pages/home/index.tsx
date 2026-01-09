@@ -12,15 +12,14 @@ function getQuizes(): QuizData[] {
 }
 const quizes = signal<QuizData[]>([])
 import { currentQuiz } from '../../store/quizStore'
+import { navigateToQuiz } from "../../utils";
 export default function Home() {
     useEffect(() => {
         quizes.value = getQuizes()
     }, [])
     const navigate = useNavigate();
     function onSelectQuiz(quiz: QuizData) {
-        currentQuiz.value = quiz;
-        localStorage.setItem(LAST_SELECTED_QUIZ_DATA_LOCALSTORAGE_KEY, JSON.stringify(quiz))
-        navigate("/quiz")
+        navigateToQuiz(navigate, quiz)
     }
     function onDeleteQuiz(quiz: QuizData) {
         quizes.value = quizes.value.filter(x => x !== quiz)

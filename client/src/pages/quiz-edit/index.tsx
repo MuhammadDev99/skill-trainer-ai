@@ -5,6 +5,7 @@ import { getQustionTypeImage } from "../../utils";
 import type { QuizData, QuizQuestion } from "../../common/types";
 import { correctColored, garbage, questionmark, wrongColored } from "../../images";
 import { signal } from "@preact/signals-react";
+import { QUIZES_DATA_LOCALSTORAGE_KEY } from "../../common/config";
 
 
 function QuestionOptionsView({ question }: { question: QuizQuestion }) {
@@ -81,7 +82,13 @@ export default function QuizEdit() {
         const deletedIds = Object.keys(markedDeletedQuestions.value).map(x => Number(x)).filter(x => markedDeletedQuestions.value[x])
         const updatedQuiz: QuizData = { ...originalQuiz, questions: originalQuiz.questions?.filter(x => !deletedIds.includes(x.id)) }
         if (changesMade) {
+            /* updatedQuiz.questions = updatedQuiz.questions.map((question, index) => { return { ...question, id: index } }) */
             currentQuiz.value = updatedQuiz
+            const quizes: QuizData[] = JSON.parse(localStorage.getItem(QUIZES_DATA_LOCALSTORAGE_KEY) ?? '[]')
+            const quizExists = quizes.some(x => x.id === updatedQuiz.id)
+            const updatedQuizes = quizExists ? quizes.map(x => x.id === updatedQuiz.id ? updatedQuiz : x) : [...quizes, updatedQuiz]
+            localStorage.setItem(QUIZES_DATA_LOCALSTORAGE_KEY, JSON.stringify(updatedQuizes))
+            markedDeletedQuestions.value = {}
         }
     }
     const questions = currentQuiz.value?.questions;
@@ -92,11 +99,11 @@ export default function QuizEdit() {
             <button disabled={!changesMade} onClick={saveChanges}>Save changes</button>
         </div>
         <div className={styles.questions}>
-            {questions?.map((question) => {
+            {questions?.map((question, index) => {
                 const isDeleted = markedDeletedQuestions.value[question.id]
                 return (<div key={question.id} className={`${styles.question} ${isDeleted ? styles.deleted : ""}`}>
                     <div className={styles.dividerContainer}>
-                        <p>{question.id}</p>
+                        <p>{index + 1}</p>
                         <div className={styles.divider}></div>
                         <img onClick={() => onToggleDeleteQuestion(question)} src={garbage} className={styles.deleteButton} />
                     </div>

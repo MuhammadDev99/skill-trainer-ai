@@ -9,11 +9,13 @@ export type ChatCompletionRequest = {
 // Quiz related --------------------------------------
 // 1. Question Type Names (String Literals, No Enums)
 export type QuestionType =
-    | 'multiple-choice'
+    | 'multi-select'
+    | 'single-select'
     | 'matching'
     | 'multi-true-false'
     | 'sorting'
-    | 'fill-in-blanks';
+    | 'fill-in-blanks'
+    | 'open-ended';
 
 // 2. Shared Base Interface
 export interface BaseQuestion {
@@ -26,15 +28,24 @@ export interface BaseQuestion {
 // --- Specific Question Types ---
 
 // 1. Choose the correct option(s)
-export interface MultipleChoiceQuestion extends BaseQuestion {
-    type: 'multiple-choice';
-    allowMultipleSelection: boolean;
+export interface MultiSelectQuestion extends BaseQuestion {
+    type: 'multi-select';
     options: {
         id: number;     // e.g. 1, 2, 3
         text: string;
         isCorrect: boolean; // AI sets this directly inside the option
     }[];
 }
+
+export interface SingleSelectQuestion extends BaseQuestion {
+    type: 'single-select';
+    options: {
+        id: number;     // e.g. 1, 2, 3
+        text: string;
+    }[];
+    correctOption: number
+}
+
 
 // 2. Match 2 sides
 export interface MatchingQuestion extends BaseQuestion {
@@ -80,14 +91,20 @@ export interface FillInBlanksQuestion extends BaseQuestion {
         correctAnswer: string;
     }[];
 }
+export interface OpenEndedQuestion extends BaseQuestion {
+    type: 'open-ended';
+    content: string;
+}
 
 
 export type QuizQuestion =
-    | MultipleChoiceQuestion
+    | MultiSelectQuestion
+    | SingleSelectQuestion
     | MatchingQuestion
     | MultiTrueFalseQuestion
     | SortingQuestion
-    | FillInBlanksQuestion;
+    | FillInBlanksQuestion
+    | OpenEndedQuestion
 
 export type QuizData = {
     questions: QuizQuestion[]
@@ -100,11 +117,13 @@ type BaseAnswer = {
 };
 
 export type QuizAnswer = BaseAnswer & (
-    | { type: 'multiple-choice', values: Record<number, boolean> }
+    | { type: 'multi-select', values: Record<number, boolean> }
+    | { type: 'single-select', selectedId: number }
     | { type: 'matching', pairs: Record<number, string> }
     | { type: 'multi-true-false', values: Record<number, boolean | null> }
     | { type: 'sorting', sortedIds: number[] }
     | { type: 'fill-in-blanks', values: Record<number, string> }
+    | { type: 'open-ended', answer: string }
 );
 //-----------------------------------------
 

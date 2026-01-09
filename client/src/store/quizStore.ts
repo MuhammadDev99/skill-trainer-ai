@@ -9,3 +9,4 @@ export const currentQuiz = signal<QuizData | null>(null)
 // Navigation state
 export const currentQuestionIndex = signal<number>(0);
 export const instantFeedbackEnabled = signal<boolean>(true);
+export const availabeQuizes = signal<QuizData[]>([]);

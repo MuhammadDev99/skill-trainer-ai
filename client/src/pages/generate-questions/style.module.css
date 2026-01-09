@@ -1,7 +1,7 @@
 .promptBox {
     width: 100%;
     height: 100px;
-    margin-bottom: 10px;
+    margin-bottom: 40px;
     border: none;
     border-radius: 30px;
     padding: 10px 20px;
@@ -13,18 +13,79 @@
     height: 100vh;
     width: 100vw;
     box-sizing: border-box;
-    background-color: rebeccapurple;
     display: flex;
     flex-direction: column;
     align-items: center;
+    background-color: rgb(19, 19, 19);
 }
 
 .promptContainer {
     width: 80%;
     margin-top: auto;
     display: flex;
+    flex-direction: column;
+    gap: 40px;
 }
 
-.generateQuestionsHeader {
+.promptContainer .promptBox {
+    width: 100%;
+}
+
+
+.generateQuestionsHeaderContainer {
     margin: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.generateQuestionsHeaderContainer button {
+    font-size: 1.5rem;
+}
+
+.promptOptions {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.promptOptions>div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px
+}
+
+.promptOptions .typesOptions img {
+    height: 50px;
+    filter: invert();
+}
+
+.promptOptions .typesOptions {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-evenly;
+}
+
+.promptOptions .typesOptions>div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.promptOptions .typesOptions>div.enabled {
+    outline: 3px solid rgb(10, 255, 83);
+    background-color: rgba(16, 150, 16, 0.562);
+}
+
+.promptOptions .typesOptions>div:hover {
+    background-color: rgba(50, 120, 115, 0.283);
+    cursor: pointer;
+}
+
+.numberOfQuestionsContainer input {
+    font-size: 2rem;
 }

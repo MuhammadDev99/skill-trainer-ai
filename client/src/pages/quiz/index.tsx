@@ -3,7 +3,7 @@ import styles from './style.module.css'
 import { downArrow, upArrow, correct, wrong, correctColored, wrongColored } from '../../images'
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom'; // Import hooks
-import type { QuizQuestion, SortingQuestion, MatchingQuestion, MultiTrueFalseQuestion, MultipleChoiceQuestion, FillInBlanksQuestion, QuizData, QuizAnswer } from '../../common/types';
+import type { QuizQuestion, SortingQuestion, MatchingQuestion, MultiTrueFalseQuestion, MultiSelectQuestion, SingleSelectQuestion, FillInBlanksQuestion, QuizData, QuizAnswer, OpenEndedQuestion } from '../../common/types';
 
 import { currentQuiz, quizAnswers, currentQuestionIndex, instantFeedbackEnabled } from '../../store/quizStore';
 /* export const testQuestions: QuizQuestion[] = [] */
@@ -52,23 +52,18 @@ function shuffle<T>(array: T[], seed: string): T[] {
 }
 
 
-function MultipleChoiceView({ question }: { question: MultipleChoiceQuestion }) {
+function MultiSelectView({ question }: { question: MultiSelectQuestion }) {
     const questionId = question.id
     const currentAnswer = quizAnswers.value[questionId] || {
-        type: "multiple-choice",
+        type: "multi-select",
         values: {}
     }
-    if (currentAnswer.type !== 'multiple-choice') {
+    if (currentAnswer.type !== 'multi-select') {
         return
     }
-    const isMultiQuestion = question.allowMultipleSelection
-
     function handleChange(optionId: number, isChecked: boolean) {
-        if (currentAnswer.type !== 'multiple-choice') return;
+        if (currentAnswer.type !== 'multi-select') return;
         const newValues = { ...currentAnswer.values }
-        if (!isMultiQuestion) {
-            Object.keys(newValues).forEach(key => newValues[Number(key)] = false)
-        }
         newValues[optionId] = isChecked
         quizAnswers.value = { ...quizAnswers.value, [questionId]: { ...currentAnswer, values: newValues } }
     }
@@ -78,7 +73,7 @@ function MultipleChoiceView({ question }: { question: MultipleChoiceQuestion }) 
                 return (
                     <div key={option.id}>
                         <label>
-                            <input checked={!!currentAnswer.values[option.id]} onChange={(e) => handleChange(option.id, e.target.checked)} type={isMultiQuestion ? 'checkbox' : 'radio'} name={`question-${questionId}`} />
+                            <input checked={!!currentAnswer.values[option.id]} onChange={(e) => handleChange(option.id, e.target.checked)} type='checkbox' name={`question-${questionId}`} />
                             {" " + option.text}
                         </label>
                     </div>
@@ -87,6 +82,37 @@ function MultipleChoiceView({ question }: { question: MultipleChoiceQuestion }) 
         </div>
     );
 }
+
+function SingleSelectView({ question }: { question: SingleSelectQuestion }) {
+    const questionId = question.id
+    const currentAnswer = quizAnswers.value[questionId] || {
+        type: "single-select",
+        values: {}
+    }
+    if (currentAnswer.type !== 'single-select') {
+        return
+    }
+
+    function handleChange(selectedId: number) {
+        if (currentAnswer.type !== 'single-select') return;
+        quizAnswers.value = { ...quizAnswers.value, [questionId]: { ...currentAnswer, selectedId: selectedId } }
+    }
+    return (
+        <div className={`${styles.quizOptions} ${styles.quizOptionsMultipleChoice}`}>
+            {question.options.map(option => {
+                return (
+                    <div key={option.id}>
+                        <label>
+                            <input checked={!!currentAnswer.selectedId} onChange={() => handleChange(option.id)} type='radio' name={`question-${questionId}`} />
+                            {" " + option.text}
+                        </label>
+                    </div>
+                )
+            })}
+        </div>
+    );
+}
+
 function MatchingView({ question }: { question: MatchingQuestion }) {
     let currentAnswer = quizAnswers.value[question.id]
     if (currentAnswer === undefined) {
@@ -248,19 +274,42 @@ function FillInBlanksView({ question }: { question: FillInBlanksQuestion }) {
         </div>
     );
 }
+
+
+function OpenEndedView({ question }: { question: OpenEndedQuestion }) {
+    const currentAnswer = quizAnswers.value[question.id] || {
+        type: 'open-ended',
+        values: {}
+    }
+    if (currentAnswer.type !== 'open-ended') return;
+
+    function onValueChange(textAnswer: string) {
+        if (currentAnswer.type !== 'open-ended') return;
+        quizAnswers.value = { ...quizAnswers.value, [question.id]: { ...currentAnswer, answer: textAnswer } }
+    }
+    return (
+        <div>
+            <textarea placeholder='Explain your answer here...' onChange={e => onValueChange(e.target.value)}></textarea>
+        </div>
+    );
+}
+
 function renderQuizOptions(question: QuizQuestion) {
     switch (question.type) {
-        case 'multiple-choice':
-            return <MultipleChoiceView question={question} />
+        case 'multi-select':
+            return <MultiSelectView question={question} />
+        case 'single-select':
+            return <SingleSelectView question={question} />
         case 'matching':
             return <MatchingView question={question} />
         case 'multi-true-false':
             return <MultiTrueFalseView question={question} />
         case 'sorting':
             return <SortingView question={question} />
-        case 'fill-in-blanks': {
+        case 'fill-in-blanks':
             return <FillInBlanksView question={question} />
-        }
+        case 'open-ended':
+            return <OpenEndedView question={question} />
         default:
             return null;
     }
@@ -299,11 +348,19 @@ function isAnswerCorrect(question: QuizQuestion, answer: QuizAnswer): boolean {
             if (!isCorrect) break
         }
     }
-    if (answer.type === 'multiple-choice' && question.type === 'multiple-choice') {
+    if (answer.type === 'multi-select' && question.type === 'multi-select') {
         for (const option of question.options) {
             isCorrect = !!answer.values[option.id] === option.isCorrect
             if (!isCorrect) break
         }
+    }
+    if (answer.type === 'single-select' && question.type === 'single-select') {
+        if (answer.selectedId) {
+            isCorrect = answer.selectedId === question.correctOption
+        }
+    }
+    if (answer.type === 'open-ended' && question.type === 'open-ended') {
+        isCorrect = true // will implement later
     }
     return isCorrect
 }
@@ -366,6 +423,19 @@ export default function Quiz() {
             const quizAnswersRaw = localStorage.getItem(LAST_SELECTED_QUIZ_ANSWERS_LOCALSTORAGE_KEY)
             quizAnswers.value = JSON.parse(quizAnswersRaw || '{}')
         }
+        function handleKeyDown(event: globalThis.KeyboardEvent) {
+            const isTyping = event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement
+            if (isTyping) return
+            const key = event.key.toLowerCase()
+            if (key === 'a') {
+                previous()
+            } else if (key === 'd') {
+                next()
+            }
+
+        }
+        window.addEventListener('keydown', handleKeyDown)
+        return () => window.removeEventListener('keydown', handleKeyDown)
     }, []);
     useEffect(() => {
         showExplanation.value = false
