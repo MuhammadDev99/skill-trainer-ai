@@ -18,7 +18,7 @@ export default function QuizGrade() {
     let unAnswered = 0
     let gradeWord = 'Unknown'
     for (const question of questions) {
-        const result = quizAnswers.value[question.id]?.isCorrect;
+        const result = quizAnswers.value[question.id]?.result?.isCorrect;
 
         if (result === true) {
             correctAnswers++;

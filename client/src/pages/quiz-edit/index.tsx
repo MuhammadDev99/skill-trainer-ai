@@ -31,7 +31,7 @@ function QuestionOptionsView({ question }: { question: QuizQuestion }) {
                 <div className={styles.options}>
                     {question.items.map(x => {
                         return (<div className={styles.trueFalseOption}>
-                            <img src={x.isTrue ? correctColored : wrongColored} /><p> <span className={x.isTrue ? styles.true : styles.false}>{x.id}. {x.statement}</span></p>
+                            <img src={x.isTrue ? correctColored : wrongColored} /><p> <span className={x.isTrue ? styles.true : styles.false}>{x.id}. {x.text}</span></p>
                         </div>)
                     })}
                 </div>
@@ -55,11 +55,21 @@ function QuestionOptionsView({ question }: { question: QuizQuestion }) {
                 })}
             </div>
         )}
-        {question.type === 'multiple-choice' && (
+        {question.type === 'multi-select' && (
             <div className={styles.questionOptions}>
                 {question.options.map(x => {
                     return (<div>
                         <p className={x.isCorrect ? styles.selected : ""}>{x.id}. {x.text}</p>
+                    </div>)
+                })}
+            </div>
+        )}
+        {question.type === 'single-select' && (
+            <div className={styles.questionOptions}>
+                {question.options.map(x => {
+                    const isCorrect = x.id === question.correctOptionId
+                    return (<div>
+                        <p className={isCorrect ? styles.selected : ""}>{x.id}. {x.text}</p>
                     </div>)
                 })}
             </div>

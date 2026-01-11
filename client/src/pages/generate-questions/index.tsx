@@ -3,22 +3,32 @@ import { chatCompletion } from '../../api/utils'
 import styles from './style.module.css'
 import { signal } from '@preact/signals-react'
 import { safe } from '../../utils/safe'
-import { QUESTIONS_GENERATION_AI_SYSTEM_MESSAGE, QUIZES_DATA_LOCALSTORAGE_KEY, SELECTED_NUMBER_OF_QUESTION_LOCAL_STORAGE_KEY, SELECTED_QUESTION_TYPES_LOCAL_STORAGE_KEY } from '../../common/config'
+import { QUIZES_DATA_LOCALSTORAGE_KEY, SELECTED_NUMBER_OF_QUESTION_LOCAL_STORAGE_KEY, SELECTED_QUESTION_TYPES_LOCAL_STORAGE_KEY } from '../../common/config'
 import { useNavigate } from 'react-router-dom'
-import { navigateToQuiz } from '../../utils'
+import { constructAIQuizGenerationRequest, navigateToQuiz } from '../../utils'
 import type { NavigateFunction } from 'react-router-dom'
 import { availabeQuizes } from '../../store/quizStore'
 import { useEffect } from 'react'
 import { filleBlankQuestion, matchQuestion, openEndedQuestion, selectMultiQuestion, selectQuestion, sortQuestion, trueFalseQuestion } from "../../images";
+import { showMessage } from '../../my-library'
 async function askAI(navigate: NavigateFunction) {
-
+    if (selectedQuestionTypes.value.length === 0) {
+        showMessage({
+            title: 'Question type',
+            content: 'Please select at least one question type.',
+            type: 'error',
+            duration: 4000
+        })
+        return
+    }
+    const questionGenerationPrompt = constructAIQuizGenerationRequest(selectedQuestionTypes.value, numberOfQuestionsToGenerate.value)
     if (prompt.value.trim().length === 0) return
     isAskingAI.value = true
     let conversation: ConversationMessage[] = []
     const systemMessage: ConversationMessage = {
         role: "system",
         content:
-            QUESTIONS_GENERATION_AI_SYSTEM_MESSAGE
+            questionGenerationPrompt
     }
     const userMessage: ConversationMessage = {
         role: "user",

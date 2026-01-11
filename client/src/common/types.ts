@@ -27,60 +27,51 @@ export interface BaseQuestion {
 
 // --- Specific Question Types ---
 
-// 1. Choose the correct option(s)
 export interface MultiSelectQuestion extends BaseQuestion {
     type: 'multi-select';
     options: {
-        id: number;     // e.g. 1, 2, 3
+        id: number;
         text: string;
-        isCorrect: boolean; // AI sets this directly inside the option
+        isCorrect: boolean;
     }[];
 }
 
 export interface SingleSelectQuestion extends BaseQuestion {
     type: 'single-select';
     options: {
-        id: number;     // e.g. 1, 2, 3
+        id: number;
         text: string;
     }[];
-    correctOption: number
+    correctOptionId: number
 }
 
 
-// 2. Match 2 sides
 export interface MatchingQuestion extends BaseQuestion {
     type: 'matching';
-    // AI Instruction: List the pairs that belong together. 
-    // Frontend: Shuffle the 'right' side when rendering.
     pairs: {
-        id: number;     // Unique ID for this specific pair
+        id: number;
         left: string;   // e.g. "Apple"
         right: string;  // e.g. "Red" (The correct match)
     }[];
 }
 
-// 3. Multi True or False (Table format)
 export interface MultiTrueFalseQuestion extends BaseQuestion {
     type: 'multi-true-false';
     items: {
         id: number;
-        statement: string; // e.g. "The sun is cold"
-        isTrue: boolean;   // false
+        text: string;
+        isTrue: boolean;
     }[];
 }
 
-// 4. Set the correct order
 export interface SortingQuestion extends BaseQuestion {
     type: 'sorting';
-    // AI Instruction: Provide items in the CORRECT order.
-    // Frontend: Shuffle them before showing to user.
     items: {
         id: number;
         text: string;
     }[];
 }
 
-// 5. Fill in the Blanks
 export interface FillInBlanksQuestion extends BaseQuestion {
     type: 'fill-in-blanks';
     // AI Instruction: Use {{number}} placeholders in text.
@@ -93,7 +84,7 @@ export interface FillInBlanksQuestion extends BaseQuestion {
 }
 export interface OpenEndedQuestion extends BaseQuestion {
     type: 'open-ended';
-    content: string;
+    answer: string
 }
 
 
@@ -113,17 +104,26 @@ export type QuizData = {
 }
 
 type BaseAnswer = {
-    isCorrect?: boolean;
+    result?: GradedAnswerResult
 };
 
 export type QuizAnswer = BaseAnswer & (
     | { type: 'multi-select', values: Record<number, boolean> }
-    | { type: 'single-select', selectedId: number }
+    | { type: 'single-select', selectedId: number | null }
     | { type: 'matching', pairs: Record<number, string> }
     | { type: 'multi-true-false', values: Record<number, boolean | null> }
     | { type: 'sorting', sortedIds: number[] }
     | { type: 'fill-in-blanks', values: Record<number, string> }
-    | { type: 'open-ended', answer: string }
+    | { type: 'open-ended', answer: string | null }
 );
+
+export type GradedAnswerResult = {
+    isCorrect: boolean,
+    grade: number, // 0-10 
+    optionResults: Record<number, boolean>, // optionId, isCorrect
+    optionsCount: number
+    correctOptionsCount: number
+    wrongOptionsCount: number
+}
 //-----------------------------------------
 
